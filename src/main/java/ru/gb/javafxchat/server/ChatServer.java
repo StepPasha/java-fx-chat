@@ -66,11 +66,6 @@ public class ChatServer {
         clientTo.sendMessage(Command.MESSAGE, "От " + from.getNick() + ": " + message);
         from.sendMessage(Command.MESSAGE, "Участнику " + nickTo + ": " + message);
     }
-    public synchronized void privateMessage(String msg, String destNick) {
-        for (ClientHandler o : clients.values()) {
-            if (o.getNick().equals(destNick)) {
-                o.sendMessage(Command.MESSAGE);
-            }
-        }
-    }
 }
+
+

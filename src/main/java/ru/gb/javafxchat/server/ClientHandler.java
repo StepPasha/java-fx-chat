@@ -14,6 +14,7 @@ public class ClientHandler {
     private DataOutputStream out;
     private String nick;
     private AuthService authService;
+    private boolean authorisedClient = false;
 
     public ClientHandler(Socket socket, ChatServer server, AuthService authService) {
         try {
@@ -22,6 +23,25 @@ public class ClientHandler {
             this.authService = authService;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            final int timeout = 120;
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(timeout);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (!authorisedClient) {
+                        socket.close();
+                        System.out.println("Тайм-аут в " + (timeout) +
+                                " секунд истек. Соедниение с клиентом закрыто.");
+                    }
+                } catch (IOException e)  {
+                    e.printStackTrace();
+                }
+            }).start();
+
             new Thread(() -> {
                 try {
                     authenticate();
@@ -63,27 +83,9 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                if (toString().startsWith("/w")) {
-                    String[] nickParts = toString().split("\\s");
-                    String nick = nickParts[1];
-                    String[] messageParts = toString().split("\\s", 3);
-                    String message = messageParts[2];
-                    if (nick != null && message != null) {
-                        if (server.isNickBusy(nick)) {
-                            sendMessage("Вы отправили личное сообщение " + nick + ": " + message);
-                            server.privateMessage("Личное сообщение от " + nick + ": " + message, nick);
-                        } else sendMessage("Пользователя " + nick + " не существует");
-                    } else {
-                        sendMessage("Неверные данные");
-                    }
-                }
-            } catch (ArrayIndexOutOfBoundsException e) {
-                sendMessage("Команда введена неверно - /w nick сообщение");
-            }
-
         }
     }
+
 
 
     public void sendMessage(Command command, String... params) {
@@ -143,6 +145,7 @@ public class ClientHandler {
             }
         }
     }
+
 
     public String getNick() {
         return nick;

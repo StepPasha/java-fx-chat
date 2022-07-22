@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum Command {
-    AUTH("/auth") { // /auth login1 pass1
+    AUTH("/auth") {
 
         @Override
         public String[] parse(String commandText) {
@@ -16,7 +16,7 @@ public enum Command {
     },
     AUTHOK("/authok") {
         @Override
-        public String[] parse(String commandText) { // /authok nick1
+        public String[] parse(String commandText) {
             final String[] split = commandText.split(TOKEN_DELIMITER);
             return new String[]{split[1]};
         }
@@ -27,7 +27,7 @@ public enum Command {
             return new String[0];
         }
     },
-    PRIVATE_MESSAGE("/w") { // /w nick1 long long message
+    PRIVATE_MESSAGE("/w") {
 
         @Override
         public String[] parse(String commandText) {
@@ -35,7 +35,7 @@ public enum Command {
             return new String[]{split[1], split[2]};
         }
     },
-    CLIENTS("/clients") { // /clients nick1 nick2 nick3
+    CLIENTS("/clients") {
 
         @Override
         public String[] parse(String commandText) {
@@ -47,7 +47,7 @@ public enum Command {
             return nicks;
         }
     },
-    ERROR("/error") { // /error error message
+    ERROR("/error") {
 
         @Override
         public String[] parse(String commandText) {
